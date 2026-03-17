@@ -31,6 +31,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         window.contentView = view
         window.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
         self.window = window
     }
 
