@@ -796,6 +796,20 @@ let page =
         version2.innerText = chrome.runtime.getManifest().version;
     }
 
+    // --- SAFARI DEBUG ---
+    const _dbg = {
+        hasBrowser: typeof browser !== 'undefined',
+        hasChrome: typeof chrome !== 'undefined',
+        browserGetURL: (typeof browser !== 'undefined' && browser.runtime) ? browser.runtime.getURL('images/logo32.png') : 'N/A',
+        chromeGetURL: (typeof chrome !== 'undefined' && chrome.runtime) ? chrome.runtime.getURL('images/logo32.png') : 'N/A',
+        chromeId: (typeof chrome !== 'undefined' && chrome.runtime) ? chrome.runtime.id : 'N/A',
+    };
+    console.log('[OldTwitter Safari DEBUG]', JSON.stringify(_dbg));
+
+    // Sample the raw header_css to see if chrome-extension:// appears
+    const _fontMatch = header_css.match(/chrome-extension:\/\/[^\)'"]+/g);
+    console.log('[OldTwitter Safari DEBUG] font URLs in header_css:', _fontMatch);
+
     // Rewrite chrome-extension:// URLs to the correct runtime base URL.
     // Use browser.runtime.getURL (native in Safari) rather than chrome.runtime.getURL
     // to guarantee we get the correct safari-web-extension:// scheme.
@@ -806,6 +820,11 @@ let page =
     const fixExtUrl = (s) => s.replace(/chrome-extension:\/\/__MSG_@@extension_id__/g, EXT_BASE);
     css = fixExtUrl(css);
     header_css = fixExtUrl(header_css);
+
+    // Confirm what font URLs look like after replacement
+    const _fontMatchAfter = header_css.match(/(?:chrome-extension|safari-web-extension):\/\/[^\)'"]+/g);
+    console.log('[OldTwitter Safari DEBUG] font URLs after fix:', _fontMatchAfter);
+    console.log('[OldTwitter Safari DEBUG] EXT_BASE:', EXT_BASE);
 
     let style = document.createElement("style");
     style.innerHTML = css;
