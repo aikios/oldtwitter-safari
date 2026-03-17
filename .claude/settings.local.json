@@ -11,7 +11,8 @@
       "Read(//Users/ahmad/Documents/oldtwitter-safari/**)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(xcodebuild -project OldTwitterSafari.xcodeproj -scheme OldTwitterSafari -configuration Debug build)"
     ]
   },
   "sandbox": {
