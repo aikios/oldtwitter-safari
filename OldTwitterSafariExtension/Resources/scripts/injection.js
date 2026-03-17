@@ -911,7 +911,7 @@ let page =
         if (chrome.runtime.lastError) {
             console.error('[OldTwitter Safari DEBUG] sendMessage error:', chrome.runtime.lastError.message);
         } else {
-            console.log('[OldTwitter Safari DEBUG] sendMessage response:', response);
+            console.log('[OldTwitter Safari DEBUG] sendMessage response:', JSON.stringify(response));
         }
     });
 })();

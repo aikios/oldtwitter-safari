@@ -628,8 +628,8 @@ const API = {
                             credentials: "include",
                         }
                     )
-                        .then((response) => { console.log('[OldTwitter Safari DEBUG] verifyCredentials status:', response.status); return response.json(); })
-                        .then((data) => {
+                        .then((response) => { console.log('[OldTwitter Safari DEBUG] verifyCredentials status:', response.status, 'ok:', response.ok); return response.json(); })
+                        .then((data) => { console.log('[OldTwitter Safari DEBUG] verifyCredentials data keys:', Object.keys(data));
                             if (data.errors && data.errors[0].code === 32) {
                                 chrome.storage.local.remove(
                                     [
@@ -701,6 +701,7 @@ const API = {
                             });
                         })
                         .catch((e) => {
+                            console.error('[OldTwitter Safari DEBUG] verifyCredentials fetch ERROR:', e && (e.message || String(e)));
                             reject(e);
                         });
                 });
