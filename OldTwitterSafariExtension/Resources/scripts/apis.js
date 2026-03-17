@@ -1,3 +1,21 @@
+// Proxy cross-origin fetches through the background service worker.
+// Safari silently hangs content-script fetches to api.x.com / api.twitter.com.
+function _bgFetch(url, opts) {
+    return new Promise((resolve, reject) => {
+        chrome.runtime.sendMessage({ action: 'fetchProxy', url, options: opts }, (resp) => {
+            if (chrome.runtime.lastError) return reject(new Error(chrome.runtime.lastError.message));
+            if (!resp) return reject(new Error('fetchProxy: no response from background'));
+            if (resp.error) return reject(new Error(resp.error));
+            resolve({
+                ok: resp.ok,
+                status: resp.status,
+                json: () => Promise.resolve(JSON.parse(resp.text)),
+                text: () => Promise.resolve(resp.text),
+            });
+        });
+    });
+}
+
 let loadingDetails = {};
 let loadingReplies = {};
 let loadingLikers = {};
@@ -616,21 +634,9 @@ const API = {
                         return resolve(d.credentials.data);
                     }
                     const _vcUrl = `https://api.${location.hostname}/1.1/account/verify_credentials.json`;
-                    console.log('[OldTwitter Safari DEBUG] verifyCredentials fetch:', _vcUrl, 'csrf:', OLDTWITTER_CONFIG.csrf ? 'present' : 'MISSING');
+                    console.log('[OldTwitter Safari DEBUG] verifyCredentials bgFetch:', _vcUrl, 'csrf:', OLDTWITTER_CONFIG.csrf ? 'present' : 'MISSING');
 
-                    // Test: bare fetch with no auth to see if network is reachable at all
-                    fetch(`https://api.${location.hostname}/1.1/help/configuration.json`)
-                        .then(r => console.log('[OldTwitter Safari DEBUG] TEST no-auth fetch status:', r.status))
-                        .catch(e => console.error('[OldTwitter Safari DEBUG] TEST no-auth fetch ERROR:', e.name, e.message));
-
-                    // Abort after 5s to detect silent hangs
-                    const _abortCtrl = new AbortController();
-                    const _abortTimer = setTimeout(() => {
-                        _abortCtrl.abort();
-                        console.error('[OldTwitter Safari DEBUG] verifyCredentials TIMED OUT after 5s - request hung');
-                    }, 5000);
-
-                    fetch(
+                    _bgFetch(
                         _vcUrl,
                         {
                             headers: {
@@ -639,10 +645,9 @@ const API = {
                                 "x-twitter-auth-type": "OAuth2Session",
                             },
                             credentials: "include",
-                            signal: _abortCtrl.signal,
                         }
                     )
-                        .then((response) => { clearTimeout(_abortTimer); console.log('[OldTwitter Safari DEBUG] verifyCredentials status:', response.status, 'ok:', response.ok); return response.json(); })
+                        .then((response) => { console.log('[OldTwitter Safari DEBUG] verifyCredentials status:', response.status, 'ok:', response.ok); return response.json(); })
                         .then((data) => { console.log('[OldTwitter Safari DEBUG] verifyCredentials data keys:', Object.keys(data));
                             if (data.errors && data.errors[0].code === 32) {
                                 chrome.storage.local.remove(
@@ -7535,7 +7540,7 @@ const API = {
         },
         send: (obj) => {
             return new Promise((resolve, reject) => {
-                fetch(`https://api.${location.hostname}/1.1/dm/new.json`, {
+                _bgFetch(`https://api.${location.hostname}/1.1/dm/new.json`, {
                     headers: {
                         authorization: OLDTWITTER_CONFIG.public_token,
                         "x-csrf-token": OLDTWITTER_CONFIG.csrf,
@@ -7613,7 +7618,7 @@ const API = {
         },
         deleteMessage: (id) => {
             return new Promise((resolve, reject) => {
-                fetch(`https://api.${location.hostname}/1.1/dm/destroy.json`, {
+                _bgFetch(`https://api.${location.hostname}/1.1/dm/destroy.json`, {
                     headers: {
                         authorization: OLDTWITTER_CONFIG.public_token,
                         "x-csrf-token": OLDTWITTER_CONFIG.csrf,

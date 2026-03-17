@@ -30,6 +30,20 @@ chrome.action.onClicked.addListener(() => {
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     console.log('[OldTwitter BG] message received:', request.action, 'tabId:', sender && sender.tab && sender.tab.id);
+    if (request.action === "fetchProxy") {
+        // Proxy cross-origin fetches from content scripts — Safari blocks them silently
+        fetch(request.url, request.options || {})
+            .then(async (r) => {
+                const text = await r.text();
+                console.log('[OldTwitter BG] fetchProxy ok:', request.url, r.status);
+                sendResponse({ ok: r.ok, status: r.status, text });
+            })
+            .catch((e) => {
+                console.error('[OldTwitter BG] fetchProxy error:', request.url, e && e.message);
+                sendResponse({ error: e && e.message });
+            });
+        return true;
+    }
     if (request.action === "inject") {
         if (!sender.tab || !sender.tab.id) {
             console.error('[OldTwitter BG] no tab id in sender:', JSON.stringify(sender));
