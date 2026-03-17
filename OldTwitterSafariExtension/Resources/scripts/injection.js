@@ -887,6 +887,9 @@ let page =
         { passive: false }
     );
 
+    // Inject layout scripts directly from the content script isolated world.
+    // This guarantees they share the same scope as vars, API, LOC etc. defined
+    // by the other content scripts, and bypasses any page CSP restrictions.
     const _injectFiles = [
             "libraries/purify.min.js",
             "libraries/twemoji.min.js",
@@ -903,15 +906,16 @@ let page =
             "libraries/tinytoast.js",
             "scripts/iframeNavigation.js",
         ].filter((i) => i);
-    console.log('[OldTwitter Safari DEBUG] sending inject message, files:', _injectFiles);
-    chrome.runtime.sendMessage({
-        action: "inject",
-        files: _injectFiles,
-    }, (response) => {
-        if (chrome.runtime.lastError) {
-            console.error('[OldTwitter Safari DEBUG] sendMessage error:', chrome.runtime.lastError.message);
-        } else {
-            console.log('[OldTwitter Safari DEBUG] sendMessage response:', JSON.stringify(response));
+
+    (async () => {
+        for (const file of _injectFiles) {
+            try {
+                const code = await fetch(_getURL(file)).then(r => r.text());
+                (0, eval)(code);
+                console.log('[OldTwitter Safari DEBUG] injected:', file);
+            } catch(e) {
+                console.error('[OldTwitter Safari DEBUG] failed to inject:', file, e && e.message);
+            }
         }
-    });
+    })();
 })();
