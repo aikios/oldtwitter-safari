@@ -6,10 +6,9 @@ let solverReady = false;
 let solverErrored = false;
 let sentData = false;
 
-let sandboxUrl = fetch(chrome.runtime.getURL(`sandbox.html`))
-    .then((resp) => resp.blob())
-    .then((blob) => { const u = URL.createObjectURL(blob); console.log('[OT Challenge] sandboxUrl created:', u.slice(0,40)); return u; })
-    .catch(e => { console.error('[OT Challenge] sandboxUrl FAILED:', e && e.message); });
+// Use the extension URL directly — the blob fetch approach hangs in Safari
+let sandboxExtUrl = chrome.runtime.getURL('sandbox.html');
+console.log('[OT Challenge] sandboxExtUrl:', sandboxExtUrl);
 
 function createSolverFrame() {
     if (solverIframe) solverIframe.remove();
@@ -22,7 +21,8 @@ function createSolverFrame() {
     solverIframe.style.opacity = 0;
     solverIframe.style.pointerEvents = "none";
     solverIframe.tabIndex = -1;
-    sandboxUrl.then((url) => { console.log('[OT Challenge] setting iframe src'); solverIframe.src = url; });
+    console.log('[OT Challenge] setting iframe src to extension URL');
+    solverIframe.src = sandboxExtUrl;
     let injectedBody = document.getElementById("injected-body");
     if (injectedBody) {
         injectedBody.appendChild(solverIframe);
