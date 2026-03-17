@@ -633,11 +633,10 @@ const API = {
                     ) {
                         return resolve(d.credentials.data);
                     }
-                    const _vcUrl = `https://api.${location.hostname}/1.1/account/verify_credentials.json`;
-                    console.log('[OldTwitter Safari DEBUG] verifyCredentials bgFetch:', _vcUrl, 'csrf:', OLDTWITTER_CONFIG.csrf ? 'present' : 'MISSING');
+                    console.log('[OldTwitter Safari DEBUG] verifyCredentials fetch (same-origin /i/api path)');
 
-                    _bgFetch(
-                        _vcUrl,
+                    fetch(
+                        `/i/api/1.1/account/verify_credentials.json`,
                         {
                             headers: {
                                 authorization: OLDTWITTER_CONFIG.public_token,
@@ -7540,7 +7539,7 @@ const API = {
         },
         send: (obj) => {
             return new Promise((resolve, reject) => {
-                _bgFetch(`https://api.${location.hostname}/1.1/dm/new.json`, {
+                fetch(`/i/api/1.1/dm/new.json`, {
                     headers: {
                         authorization: OLDTWITTER_CONFIG.public_token,
                         "x-csrf-token": OLDTWITTER_CONFIG.csrf,
@@ -7618,7 +7617,7 @@ const API = {
         },
         deleteMessage: (id) => {
             return new Promise((resolve, reject) => {
-                _bgFetch(`https://api.${location.hostname}/1.1/dm/destroy.json`, {
+                fetch(`/i/api/1.1/dm/destroy.json`, {
                     headers: {
                         authorization: OLDTWITTER_CONFIG.public_token,
                         "x-csrf-token": OLDTWITTER_CONFIG.csrf,
