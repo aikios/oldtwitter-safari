@@ -45,6 +45,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 },
                 injectImmediately: true,
                 files: request.files,
+                world: "ISOLATED",
             })
             .then((res) => {
                 console.log('[OldTwitter BG] inject success:', JSON.stringify(res));

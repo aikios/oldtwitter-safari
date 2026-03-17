@@ -16,71 +16,175 @@
             ]
         },
         "condition": {
-            "urlFilter": "*://twitter.com/*",
-            "resourceTypes": ["main_frame", "sub_frame", "stylesheet", "script", "image", "font", "xmlhttprequest", "other"]
+            "urlFilter": "||twitter.com/",
+            "resourceTypes": [
+                "main_frame",
+                "sub_frame",
+                "stylesheet",
+                "script",
+                "image",
+                "font",
+                "xmlhttprequest",
+                "other"
+            ]
         }
     },
     {
         "id": 2,
         "priority": 1,
-        "action": { "type": "block" },
+        "action": {
+            "type": "block"
+        },
         "condition": {
-            "urlFilter": "*://twitter.com/sw.js",
-            "resourceTypes": ["main_frame", "sub_frame", "script", "image", "stylesheet", "object", "xmlhttprequest", "other"]
+            "urlFilter": "||twitter.com/sw.js",
+            "resourceTypes": [
+                "main_frame",
+                "sub_frame",
+                "script",
+                "image",
+                "stylesheet",
+                "object",
+                "xmlhttprequest",
+                "other"
+            ]
         }
     },
     {
         "id": 3,
         "priority": 1,
-        "action": { "type": "redirect", "redirect": { "extensionPath": "/images/logo32_new.png" } },
+        "action": {
+            "type": "redirect",
+            "redirect": {
+                "extensionPath": "/images/logo32_new.png"
+            }
+        },
         "condition": {
-            "urlFilter": "*://abs.twimg.com/favicons/twitter.3.ico",
-            "resourceTypes": ["main_frame", "sub_frame", "stylesheet", "script", "image", "font", "xmlhttprequest", "other"]
+            "urlFilter": "||abs.twimg.com/favicons/twitter.3.ico",
+            "resourceTypes": [
+                "main_frame",
+                "sub_frame",
+                "stylesheet",
+                "script",
+                "image",
+                "font",
+                "xmlhttprequest",
+                "other"
+            ]
         }
     },
     {
         "id": 4,
         "priority": 1,
-        "action": { "type": "redirect", "redirect": { "extensionPath": "/images/logo32_new_notification.png" } },
+        "action": {
+            "type": "redirect",
+            "redirect": {
+                "extensionPath": "/images/logo32_new_notification.png"
+            }
+        },
         "condition": {
-            "urlFilter": "*://abs.twimg.com/favicons/twitter-pip.3.ico",
-            "resourceTypes": ["main_frame", "sub_frame", "stylesheet", "script", "image", "font", "xmlhttprequest", "other"]
+            "urlFilter": "||abs.twimg.com/favicons/twitter-pip.3.ico",
+            "resourceTypes": [
+                "main_frame",
+                "sub_frame",
+                "stylesheet",
+                "script",
+                "image",
+                "font",
+                "xmlhttprequest",
+                "other"
+            ]
         }
     },
     {
         "id": 5,
         "priority": 1,
-        "action": { "type": "redirect", "redirect": { "extensionPath": "/images/logo192.png" } },
+        "action": {
+            "type": "redirect",
+            "redirect": {
+                "extensionPath": "/images/logo192.png"
+            }
+        },
         "condition": {
-            "urlFilter": "*://abs.twimg.com/responsive-web/client-web/icon-default.*.png",
-            "resourceTypes": ["main_frame", "sub_frame", "stylesheet", "script", "image", "font", "xmlhttprequest", "other"]
+            "urlFilter": "||abs.twimg.com/responsive-web/client-web/icon-default.*.png",
+            "resourceTypes": [
+                "main_frame",
+                "sub_frame",
+                "stylesheet",
+                "script",
+                "image",
+                "font",
+                "xmlhttprequest",
+                "other"
+            ]
         }
     },
     {
         "id": 6,
         "priority": 1,
-        "action": { "type": "redirect", "redirect": { "extensionPath": "/images/logo192.png" } },
+        "action": {
+            "type": "redirect",
+            "redirect": {
+                "extensionPath": "/images/logo192.png"
+            }
+        },
         "condition": {
-            "urlFilter": "*://abs.twimg.com/responsive-web/client-web/icon-default-maskable.*.png",
-            "resourceTypes": ["main_frame", "sub_frame", "stylesheet", "script", "image", "font", "xmlhttprequest", "other"]
+            "urlFilter": "||abs.twimg.com/responsive-web/client-web/icon-default-maskable.*.png",
+            "resourceTypes": [
+                "main_frame",
+                "sub_frame",
+                "stylesheet",
+                "script",
+                "image",
+                "font",
+                "xmlhttprequest",
+                "other"
+            ]
         }
     },
     {
         "id": 7,
         "priority": 1,
-        "action": { "type": "redirect", "redirect": { "extensionPath": "/images/logo512.png" } },
+        "action": {
+            "type": "redirect",
+            "redirect": {
+                "extensionPath": "/images/logo512.png"
+            }
+        },
         "condition": {
-            "urlFilter": "*://abs.twimg.com/responsive-web/client-web/icon-default-large.*.png",
-            "resourceTypes": ["main_frame", "sub_frame", "stylesheet", "script", "image", "font", "xmlhttprequest", "other"]
+            "urlFilter": "||abs.twimg.com/responsive-web/client-web/icon-default-large.*.png",
+            "resourceTypes": [
+                "main_frame",
+                "sub_frame",
+                "stylesheet",
+                "script",
+                "image",
+                "font",
+                "xmlhttprequest",
+                "other"
+            ]
         }
     },
     {
         "id": 8,
         "priority": 1,
-        "action": { "type": "redirect", "redirect": { "extensionPath": "/images/logo512.png" } },
+        "action": {
+            "type": "redirect",
+            "redirect": {
+                "extensionPath": "/images/logo512.png"
+            }
+        },
         "condition": {
-            "urlFilter": "*://abs.twimg.com/responsive-web/client-web/icon-default-maskable-large.*.png",
-            "resourceTypes": ["main_frame", "sub_frame", "stylesheet", "script", "image", "font", "xmlhttprequest", "other"]
+            "urlFilter": "||abs.twimg.com/responsive-web/client-web/icon-default-maskable-large.*.png",
+            "resourceTypes": [
+                "main_frame",
+                "sub_frame",
+                "stylesheet",
+                "script",
+                "image",
+                "font",
+                "xmlhttprequest",
+                "other"
+            ]
         }
     },
     {
@@ -97,10 +201,24 @@
             ]
         },
         "condition": {
-            "urlFilter": "*://*.twimg.com/*",
-            "initiatorDomains": ["twitter.com"],
-            "excludedInitiatorDomains": ["tweetdeck.twitter.com", "platform.twitter.com"],
-            "resourceTypes": ["main_frame", "sub_frame", "stylesheet", "script", "image", "font", "xmlhttprequest", "other"]
+            "urlFilter": "||twimg.com/",
+            "initiatorDomains": [
+                "twitter.com"
+            ],
+            "excludedInitiatorDomains": [
+                "tweetdeck.twitter.com",
+                "platform.twitter.com"
+            ],
+            "resourceTypes": [
+                "main_frame",
+                "sub_frame",
+                "stylesheet",
+                "script",
+                "image",
+                "font",
+                "xmlhttprequest",
+                "other"
+            ]
         }
     },
     {
@@ -117,22 +235,45 @@
             ]
         },
         "condition": {
-            "urlFilter": "*://*.twimg.com/*",
-            "initiatorDomains": ["tweetdeck.twitter.com"],
-            "resourceTypes": ["main_frame", "sub_frame", "stylesheet", "script", "image", "font", "xmlhttprequest", "other"]
+            "urlFilter": "||twimg.com/",
+            "initiatorDomains": [
+                "tweetdeck.twitter.com"
+            ],
+            "resourceTypes": [
+                "main_frame",
+                "sub_frame",
+                "stylesheet",
+                "script",
+                "image",
+                "font",
+                "xmlhttprequest",
+                "other"
+            ]
         }
     },
     {
         "id": 11,
         "priority": 1,
-        "action": { "type": "redirect", "redirect": { "extensionPath": "/images/logo512.png" } },
+        "action": {
+            "type": "redirect",
+            "redirect": {
+                "extensionPath": "/images/logo512.png"
+            }
+        },
         "condition": {
-            "urlFilter": "*://abs.twimg.com/responsive-web/client-web/icon-ios.*.png",
-            "resourceTypes": ["main_frame", "sub_frame", "stylesheet", "script", "image", "font", "xmlhttprequest", "other"]
+            "urlFilter": "||abs.twimg.com/responsive-web/client-web/icon-ios.*.png",
+            "resourceTypes": [
+                "main_frame",
+                "sub_frame",
+                "stylesheet",
+                "script",
+                "image",
+                "font",
+                "xmlhttprequest",
+                "other"
+            ]
         }
     },
-    
-
     {
         "id": 12,
         "priority": 1,
@@ -150,17 +291,37 @@
             ]
         },
         "condition": {
-            "urlFilter": "*://x.com/*",
-            "resourceTypes": ["main_frame", "sub_frame", "stylesheet", "script", "image", "font", "xmlhttprequest", "other"]
+            "urlFilter": "||x.com/",
+            "resourceTypes": [
+                "main_frame",
+                "sub_frame",
+                "stylesheet",
+                "script",
+                "image",
+                "font",
+                "xmlhttprequest",
+                "other"
+            ]
         }
     },
     {
         "id": 13,
         "priority": 1,
-        "action": { "type": "block" },
+        "action": {
+            "type": "block"
+        },
         "condition": {
-            "urlFilter": "*://x.com/sw.js",
-            "resourceTypes": ["main_frame", "sub_frame", "script", "image", "stylesheet", "object", "xmlhttprequest", "other"]
+            "urlFilter": "||x.com/sw.js",
+            "resourceTypes": [
+                "main_frame",
+                "sub_frame",
+                "script",
+                "image",
+                "stylesheet",
+                "object",
+                "xmlhttprequest",
+                "other"
+            ]
         }
     },
     {
@@ -177,10 +338,24 @@
             ]
         },
         "condition": {
-            "urlFilter": "*://*.twimg.com/*",
-            "initiatorDomains": ["x.com"],
-            "excludedInitiatorDomains": ["tweetdeck.x.com", "platform.x.com"],
-            "resourceTypes": ["main_frame", "sub_frame", "stylesheet", "script", "image", "font", "xmlhttprequest", "other"]
+            "urlFilter": "||twimg.com/",
+            "initiatorDomains": [
+                "x.com"
+            ],
+            "excludedInitiatorDomains": [
+                "tweetdeck.x.com",
+                "platform.x.com"
+            ],
+            "resourceTypes": [
+                "main_frame",
+                "sub_frame",
+                "stylesheet",
+                "script",
+                "image",
+                "font",
+                "xmlhttprequest",
+                "other"
+            ]
         }
     },
     {
@@ -197,9 +372,20 @@
             ]
         },
         "condition": {
-            "urlFilter": "*://*.twimg.com/*",
-            "initiatorDomains": ["tweetdeck.x.com"],
-            "resourceTypes": ["main_frame", "sub_frame", "stylesheet", "script", "image", "font", "xmlhttprequest", "other"]
+            "urlFilter": "||twimg.com/",
+            "initiatorDomains": [
+                "tweetdeck.x.com"
+            ],
+            "resourceTypes": [
+                "main_frame",
+                "sub_frame",
+                "stylesheet",
+                "script",
+                "image",
+                "font",
+                "xmlhttprequest",
+                "other"
+            ]
         }
     }
 ]
