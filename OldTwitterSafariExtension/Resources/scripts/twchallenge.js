@@ -8,8 +8,8 @@ let sentData = false;
 
 let sandboxUrl = fetch(chrome.runtime.getURL(`sandbox.html`))
     .then((resp) => resp.blob())
-    .then((blob) => URL.createObjectURL(blob))
-    .catch(console.error);
+    .then((blob) => { const u = URL.createObjectURL(blob); console.log('[OT Challenge] sandboxUrl created:', u.slice(0,40)); return u; })
+    .catch(e => { console.error('[OT Challenge] sandboxUrl FAILED:', e && e.message); });
 
 function createSolverFrame() {
     if (solverIframe) solverIframe.remove();
@@ -22,7 +22,7 @@ function createSolverFrame() {
     solverIframe.style.opacity = 0;
     solverIframe.style.pointerEvents = "none";
     solverIframe.tabIndex = -1;
-    sandboxUrl.then((url) => (solverIframe.src = url));
+    sandboxUrl.then((url) => { console.log('[OT Challenge] setting iframe src'); solverIframe.src = url; });
     let injectedBody = document.getElementById("injected-body");
     if (injectedBody) {
         injectedBody.appendChild(solverIframe);
@@ -84,7 +84,8 @@ setInterval(() => {
 }, 2000);
 
 window.addEventListener("message", (e) => {
-    if (e.source !== solverIframe.contentWindow) return;
+    console.log('[OT Challenge] window message received, origin:', e.origin, 'action:', e.data && e.data.action);
+    if (e.source !== solverIframe.contentWindow) { console.log('[OT Challenge] message not from solver iframe, ignoring'); return; }
     let data = e.data;
     if (data.action === "solved" && typeof data.id === "number") {
         let { id, result } = data;
@@ -178,11 +179,13 @@ async function initChallenge() {
         let sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
         let host = location.hostname;
         if (!["x.com", "twitter.com"].includes(host)) host = "x.com";
+        console.log('[OT Challenge] initChallenge: fetching homepage from', host);
         try {
             homepageData = await _fetch(`https://${host}/`).then((res) =>
                 res.text()
             );
         } catch (e) {
+            console.warn('[OT Challenge] homepage fetch attempt 1 failed:', e && e.message, '— retrying');
             await sleep(500);
             try {
                 homepageData = await _fetch(`https://${host}/`).then((res) =>
@@ -192,6 +195,7 @@ async function initChallenge() {
                 throw new Error("Failed to fetch homepage: " + e);
             }
         }
+        console.log('[OT Challenge] homepage fetched, length:', homepageData.length);
         let dom = new DOMParser().parseFromString(homepageData, "text/html");
         let verificationKey = dom.querySelector(
             'meta[name="twitter-site-verification"]'
@@ -202,13 +206,16 @@ async function initChallenge() {
 
         let vendorCode = homepageData.match(/vendor.(\w+).js"/)[1];
         let challengeCode = homepageData.match(/"ondemand.s":"(\w+)"/)[1];
+        console.log('[OT Challenge] vendorCode:', vendorCode, 'challengeCode:', challengeCode);
 
         OLDTWITTER_CONFIG.verificationKey = verificationKey;
 
         function sendInit() {
             sentData = true;
+            console.log('[OT Challenge] sendInit called, iframe contentWindow:', !!solverIframe?.contentWindow);
             if (!solverIframe || !solverIframe.contentWindow)
                 return setTimeout(sendInit, 50);
+            console.log('[OT Challenge] posting init to iframe');
             solverIframe.contentWindow.postMessage(
                 {
                     action: "init",

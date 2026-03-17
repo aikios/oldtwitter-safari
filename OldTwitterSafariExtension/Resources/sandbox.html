@@ -17,7 +17,9 @@
 
         let initError = false, solver;
         window.addEventListener('message', async function (event) {
-            if (event.origin !== 'https://twitter.com' && event.origin !== 'https://x.com') {
+            console.log('[OT Sandbox] message received, origin:', event.origin, 'action:', event.data && event.data.action);
+            if (event.origin !== 'https://twitter.com' && event.origin !== 'https://x.com' && !event.origin.startsWith('safari-web-extension://') && !event.origin.startsWith('chrome-extension://') && event.origin !== 'null') {
+                console.log('[OT Sandbox] ignoring message from unexpected origin:', event.origin);
                 return;
             }
             let data = event.data;
@@ -42,7 +44,7 @@
                     let headerMatch = challengeData.match(headerRegex);
                     if (!headerMatch) {
                         console.error('Uh oh, header not found!! Report to https://github.com/dimdenGD/OldTwitter/issues');
-                        event.source.postMessage({ action: 'initError', error: `Header not found at ${data.challengeCode} (${String(challengeData).slice(0, 500)}...)` }, event.origin);
+                        event.source.postMessage({ action: 'initError', error: `Header not found at ${data.challengeCode} (${String(challengeData).slice(0, 500)}...)` }, "*");
                         initError = true;
                         return;
                     }
@@ -103,16 +105,16 @@
                     }
                     webpackChunk_twitter_responsive_web[1][1][id](chunks, cache, wreq);
                     solver = window._CHALLENGE()();
-                    event.source.postMessage({ action: 'ready' }, event.origin);
+                    event.source.postMessage({ action: 'ready' }, "*");
                 } catch (e) {
                     console.error(e);
-                    event.source.postMessage({ action: 'initError', error: String(e) }, event.origin);
+                    event.source.postMessage({ action: 'initError', error: String(e) }, "*");
                     initError = true;
                 }
             } else if (data.action === 'solve') {
                 if (initError) {
                     console.error('Initialization error');
-                    event.source.postMessage({ action: 'error', error: 'Initialization error', id: data.id }, event.origin);
+                    event.source.postMessage({ action: 'error', error: 'Initialization error', id: data.id }, "*");
                     return;
                 }
                 if (!solver) {
@@ -131,16 +133,16 @@
                     }
                     if (initError || !solver) {
                         console.error('Solver not initialized');
-                        event.source.postMessage({ action: 'error', error: 'Solver timed out', id: data.id }, event.origin);
+                        event.source.postMessage({ action: 'error', error: 'Solver timed out', id: data.id }, "*");
                         return;
                     }
                 }
                 try {
                     let result = await solver(data.path, data.method);
-                    event.source.postMessage({ action: 'solved', result, id: data.id }, event.origin);
+                    event.source.postMessage({ action: 'solved', result, id: data.id }, "*");
                 } catch (e) {
                     console.error('Solver error:', e);
-                    event.source.postMessage({ action: 'error', error: `${e.message}\n${e.stack}`, id: data.id }, event.origin);
+                    event.source.postMessage({ action: 'error', error: `${e.message}\n${e.stack}`, id: data.id }, "*");
                 }
             }
         });
