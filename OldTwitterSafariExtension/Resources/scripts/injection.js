@@ -816,8 +816,12 @@ let page =
     const _getURL = (typeof browser !== 'undefined' && browser.runtime && browser.runtime.getURL)
         ? (p) => browser.runtime.getURL(p)
         : (p) => chrome.runtime.getURL(p);
+    // Safari substitutes __MSG_@@extension_id__ with the real UUID when serving
+    // the CSS resource, but keeps the chrome-extension:// scheme. We extract the
+    // correct scheme from browser.runtime.getURL and replace only the scheme.
     const EXT_BASE = _getURL("").replace(/\/$/, "");
-    const fixExtUrl = (s) => s.replace(/chrome-extension:\/\/__MSG_@@extension_id__/g, EXT_BASE);
+    const correctScheme = EXT_BASE.split('://')[0] + '://'; // e.g. "safari-web-extension://"
+    const fixExtUrl = (s) => s.replace(/chrome-extension:\/\//g, correctScheme);
     css = fixExtUrl(css);
     header_css = fixExtUrl(header_css);
 
