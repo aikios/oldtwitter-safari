@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git init:*)",
+      "WebFetch(domain:api.github.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(gh api:*)",
+      "Bash(BASE_DIR=\"/Users/ahmad/Documents/oldtwitter-safari/OldTwitterSafariExtension/Resources\")",
+      "Bash(mkdir -p \"$BASE_DIR\")",
+      "Read(//Users/ahmad/Documents/oldtwitter-safari/**)",
+      "Bash(git add:*)"
+    ]
+  },
+  "sandbox": {
+    "enabled": true,
+    "autoAllowBashIfSandboxed": true
+  }
+}
