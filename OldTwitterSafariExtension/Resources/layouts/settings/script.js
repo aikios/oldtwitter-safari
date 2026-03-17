@@ -1,3 +1,4 @@
+console.log('[OldTwitter Safari DEBUG] settings/script.js executing');
 let user = {};
 let customVars = {};
 let linkColor 

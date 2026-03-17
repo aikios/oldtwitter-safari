@@ -615,8 +615,10 @@ const API = {
                     ) {
                         return resolve(d.credentials.data);
                     }
+                    const _vcUrl = `https://api.${location.hostname}/1.1/account/verify_credentials.json`;
+                    console.log('[OldTwitter Safari DEBUG] verifyCredentials fetch:', _vcUrl, 'csrf:', OLDTWITTER_CONFIG.csrf ? 'present' : 'MISSING');
                     fetch(
-                        `https://api.${location.hostname}/1.1/account/verify_credentials.json`,
+                        _vcUrl,
                         {
                             headers: {
                                 authorization: OLDTWITTER_CONFIG.public_token,
@@ -626,7 +628,7 @@ const API = {
                             credentials: "include",
                         }
                     )
-                        .then((response) => response.json())
+                        .then((response) => { console.log('[OldTwitter Safari DEBUG] verifyCredentials status:', response.status); return response.json(); })
                         .then((data) => {
                             if (data.errors && data.errors[0].code === 32) {
                                 chrome.storage.local.remove(

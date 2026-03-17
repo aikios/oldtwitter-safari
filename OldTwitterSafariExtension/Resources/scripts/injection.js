@@ -887,9 +887,7 @@ let page =
         { passive: false }
     );
 
-    chrome.runtime.sendMessage({
-        action: "inject",
-        files: [
+    const _injectFiles = [
             "libraries/purify.min.js",
             "libraries/twemoji.min.js",
             page.name === "settings" ? "libraries/parseCssColor.js" : "",
@@ -904,6 +902,16 @@ let page =
             "libraries/emojipicker.js",
             "libraries/tinytoast.js",
             "scripts/iframeNavigation.js",
-        ].filter((i) => i),
+        ].filter((i) => i);
+    console.log('[OldTwitter Safari DEBUG] sending inject message, files:', _injectFiles);
+    chrome.runtime.sendMessage({
+        action: "inject",
+        files: _injectFiles,
+    }, (response) => {
+        if (chrome.runtime.lastError) {
+            console.error('[OldTwitter Safari DEBUG] sendMessage error:', chrome.runtime.lastError.message);
+        } else {
+            console.log('[OldTwitter Safari DEBUG] sendMessage response:', response);
+        }
     });
 })();
