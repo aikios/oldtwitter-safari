@@ -617,6 +617,19 @@ const API = {
                     }
                     const _vcUrl = `https://api.${location.hostname}/1.1/account/verify_credentials.json`;
                     console.log('[OldTwitter Safari DEBUG] verifyCredentials fetch:', _vcUrl, 'csrf:', OLDTWITTER_CONFIG.csrf ? 'present' : 'MISSING');
+
+                    // Test: bare fetch with no auth to see if network is reachable at all
+                    fetch(`https://api.${location.hostname}/1.1/help/configuration.json`)
+                        .then(r => console.log('[OldTwitter Safari DEBUG] TEST no-auth fetch status:', r.status))
+                        .catch(e => console.error('[OldTwitter Safari DEBUG] TEST no-auth fetch ERROR:', e.name, e.message));
+
+                    // Abort after 5s to detect silent hangs
+                    const _abortCtrl = new AbortController();
+                    const _abortTimer = setTimeout(() => {
+                        _abortCtrl.abort();
+                        console.error('[OldTwitter Safari DEBUG] verifyCredentials TIMED OUT after 5s - request hung');
+                    }, 5000);
+
                     fetch(
                         _vcUrl,
                         {
@@ -626,9 +639,10 @@ const API = {
                                 "x-twitter-auth-type": "OAuth2Session",
                             },
                             credentials: "include",
+                            signal: _abortCtrl.signal,
                         }
                     )
-                        .then((response) => { console.log('[OldTwitter Safari DEBUG] verifyCredentials status:', response.status, 'ok:', response.ok); return response.json(); })
+                        .then((response) => { clearTimeout(_abortTimer); console.log('[OldTwitter Safari DEBUG] verifyCredentials status:', response.status, 'ok:', response.ok); return response.json(); })
                         .then((data) => { console.log('[OldTwitter Safari DEBUG] verifyCredentials data keys:', Object.keys(data));
                             if (data.errors && data.errors[0].code === 32) {
                                 chrome.storage.local.remove(
