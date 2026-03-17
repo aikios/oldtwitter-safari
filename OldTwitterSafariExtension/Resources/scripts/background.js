@@ -1,5 +1,9 @@
-// Safari compatibility: load browser-polyfill for chrome.* API support
-try { importScripts('../libraries/browser-polyfill.min.js'); } catch(e) {}
+// Safari compatibility shim: alias chrome <-> browser
+try { importScripts('../libraries/browser-polyfill.min.js'); } catch(e) {
+    // If import fails, set up the alias manually
+    if (typeof browser !== 'undefined' && typeof chrome === 'undefined') { globalThis.chrome = browser; }
+    else if (typeof chrome !== 'undefined' && typeof browser === 'undefined') { globalThis.browser = chrome; }
+}
 
 chrome.contextMenus.create({
     id: "open_settings",

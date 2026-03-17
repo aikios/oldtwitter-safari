@@ -797,9 +797,12 @@ let page =
     }
 
     // Rewrite chrome-extension:// URLs to the correct runtime base URL.
-    // Chrome performs __MSG_@@extension_id__ substitution automatically; Safari does not,
-    // and uses safari-web-extension:// instead of chrome-extension://.
-    const EXT_BASE = chrome.runtime.getURL("").replace(/\/$/, "");
+    // Use browser.runtime.getURL (native in Safari) rather than chrome.runtime.getURL
+    // to guarantee we get the correct safari-web-extension:// scheme.
+    const _getURL = (typeof browser !== 'undefined' && browser.runtime && browser.runtime.getURL)
+        ? (p) => browser.runtime.getURL(p)
+        : (p) => chrome.runtime.getURL(p);
+    const EXT_BASE = _getURL("").replace(/\/$/, "");
     const fixExtUrl = (s) => s.replace(/chrome-extension:\/\/__MSG_@@extension_id__/g, EXT_BASE);
     css = fixExtUrl(css);
     header_css = fixExtUrl(header_css);
