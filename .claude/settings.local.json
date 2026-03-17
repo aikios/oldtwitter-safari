@@ -9,7 +9,9 @@
       "Bash(BASE_DIR=\"/Users/ahmad/Documents/oldtwitter-safari/OldTwitterSafariExtension/Resources\")",
       "Bash(mkdir -p \"$BASE_DIR\")",
       "Read(//Users/ahmad/Documents/oldtwitter-safari/**)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
     ]
   },
   "sandbox": {
