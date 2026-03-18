@@ -1,11 +1,12 @@
-// OldTwitter Challenge Solver — runs in the page's MAIN world (not content script isolated world).
-// Injected via web_accessible_resources so it executes in page context where:
-//   - eval() works (DNR Rule 12 strips x.com's CSP, extension CSP doesn't apply here)
-//   - fetch to abs.twimg.com works (DNR Rule 14 adds CORS for x.com initiator)
-//   - window.postMessage is on the REAL window, avoiding Safari isolated-world postMessage issues
-//   - window.webpackChunk_twitter_responsive_web already exists (vendor.js already loaded by page)
+// OldTwitter Challenge Solver — runs in the page's MAIN world.
+// OldTwitter replaces the page DOM, so Twitter's vendor.js never runs and
+// webpackChunk_twitter_responsive_web is never populated by the page itself.
+// We fetch vendor.js + ondemand.s.*.js manually and eval them, exactly as the
+// original sandbox.html does — but in the main world to avoid Safari's
+// isolated-world postMessage limitations.
 //
-// Communicates with the content script (twchallenge.js) via window.postMessage using __ot__ tagged messages.
+// Communication: content script (twchallenge.js) ↔ this script via window.postMessage
+// with {__src: '__ot__', action: ...} messages.
 
 (function () {
     const TAG = '__ot__';
@@ -25,25 +26,47 @@
 
         if (data.action === 'init') {
             if (solver) {
-                // Already initialized — just signal ready again
+                // Already initialized
                 window.postMessage({ __src: TAG, action: 'ready' }, '*');
                 return;
             }
             try {
-                // Wait for Twitter's webpack to be available (vendor.js loads async after document_start)
-                let waited = 0;
-                while (!window.webpackChunk_twitter_responsive_web) {
-                    await sleep(100);
-                    waited += 100;
-                    if (waited > 15000) throw new Error('Timed out waiting for webpackChunk_twitter_responsive_web');
+                // Fetch vendor.js and ondemand.s.*.js in parallel (same as sandbox.html).
+                // OldTwitter replaces the page so Twitter's webpack never loads; we
+                // must bootstrap it ourselves.
+                console.log('[OT Solver] fetching vendor.js (' + data.vendorCode + ') + challenge (' + data.challengeCode + ')');
+                const [vendorData, challengeData] = await Promise.all([
+                    fetch('https://abs.twimg.com/responsive-web/client-web/vendor.' + data.vendorCode + '.js').then(function (r) { return r.text(); }),
+                    fetch('https://abs.twimg.com/responsive-web/client-web/ondemand.s.' + data.challengeCode + 'a.js').then(function (r) { return r.text(); })
+                ]);
+                console.log('[OT Solver] scripts fetched, vendor:', vendorData.length, 'challenge:', challengeData.length);
+
+                // Bootstrap webpack in the main world by eval-ing vendor.js
+                // eslint-disable-next-line no-eval
+                eval(vendorData);
+
+                // Set the twitter-site-verification meta tag (challenge solver reads it)
+                let verif = document.querySelector('meta[name="twitter-site-verification"]');
+                if (!verif) {
+                    verif = document.createElement('meta');
+                    verif.name = 'twitter-site-verification';
+                    document.head.appendChild(verif);
                 }
-                console.log('[OT Solver] webpack found, fetching challenge script:', data.challengeCode);
+                verif.content = data.verificationCode;
 
-                // Fetch only the challenge script (vendor.js already available via page's webpack)
-                const challengeData = await fetch(
-                    'https://abs.twimg.com/responsive-web/client-web/ondemand.s.' + data.challengeCode + 'a.js'
-                ).then(function (r) { return r.text(); });
+                // Add animation SVGs (challenge solver needs them in the DOM)
+                let animsDiv = document.getElementById('__ot_anims__');
+                if (!animsDiv) {
+                    animsDiv = document.createElement('div');
+                    animsDiv.id = '__ot_anims__';
+                    animsDiv.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden;pointer-events:none;';
+                    document.body.appendChild(animsDiv);
+                }
+                for (let anim of (data.anims || [])) {
+                    animsDiv.innerHTML += '\n' + anim;
+                }
 
+                // Match the challenge module and patch it to expose the solver function
                 const headerRegex = /(\d+):(.+)=>.+default:\(\)=>(\w)}\);/;
                 const headerMatch = challengeData.match(headerRegex);
                 if (!headerMatch) {
@@ -53,19 +76,19 @@
                     );
                 }
 
-                // Patch the challenge module: make it expose the solver function as window._OT_CHALLENGE
+                // Patch: make the module factory set window._OT_CHALLENGE instead of just exporting
                 const patched = challengeData.replace(headerRegex, '$1:$2=>{window._OT_CHALLENGE=()=>$3;');
 
-                // eval() into the page context — Twitter's webpack processes the push,
-                // calls our patched module factory, which sets window._OT_CHALLENGE.
+                // eval the patched challenge script — vendor.js set up webpack, so
+                // webpackChunk_twitter_responsive_web.push() is intercepted and the module executes
                 // eslint-disable-next-line no-eval
                 eval(patched);
 
-                // Wait a tick for webpack to process the newly pushed chunk
+                // Give webpack a tick to process the newly pushed chunk
                 await sleep(50);
 
                 if (typeof window._OT_CHALLENGE !== 'function') {
-                    // Fallback: try to run the module manually with a minimal webpack require
+                    // Fallback: run the module manually with a minimal webpack require
                     console.warn('[OT Solver] _OT_CHALLENGE not set by webpack push, trying manual require');
                     const id = headerMatch[1];
                     const chunks = window.webpackChunk_twitter_responsive_web || [];
@@ -74,7 +97,7 @@
                         if (payload && payload[1]) Object.assign(registry, payload[1]);
                     }
                     if (!registry[id]) {
-                        throw new Error('Module ' + id + ' not found in webpack registry after eval');
+                        throw new Error('Module ' + id + ' not found in webpack registry after eval (registry size: ' + Object.keys(registry).length + ')');
                     }
                     const cache = {};
                     function wreq(modId) {
@@ -101,12 +124,24 @@
                         mod.loaded = true;
                         return mod.exports;
                     }
-                    registry[id]({}, {}, wreq);
+                    // In sandbox.html the challenge chunk is always at index [1][1][id].
+                    // Here we search all chunks for the module with the right id.
+                    let ran = false;
+                    for (const chunk of chunks) {
+                        if (chunk && chunk[1] && chunk[1][id]) {
+                            chunk[1][id]({}, {}, wreq);
+                            ran = true;
+                            break;
+                        }
+                    }
+                    if (!ran) {
+                        throw new Error('Could not find and run module ' + id + ' in any chunk');
+                    }
                     await sleep(20);
                 }
 
                 if (typeof window._OT_CHALLENGE !== 'function') {
-                    throw new Error('_OT_CHALLENGE not set after eval and manual require');
+                    throw new Error('_OT_CHALLENGE not set after eval and manual require fallback');
                 }
 
                 solver = window._OT_CHALLENGE()();
