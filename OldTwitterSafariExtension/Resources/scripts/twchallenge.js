@@ -6,9 +6,12 @@ let solverReady = false;
 let solverErrored = false;
 let sentData = false;
 
-// Use the extension URL directly — the blob fetch approach hangs in Safari
-let sandboxExtUrl = chrome.runtime.getURL('sandbox.html');
-console.log('[OT Challenge] sandboxExtUrl:', sandboxExtUrl);
+// Fetch sandbox.html as blob URL so it loads free of extension CSP restrictions.
+// safari.pages declaration was removed from manifest so this fetch now works.
+let sandboxUrl = fetch(chrome.runtime.getURL('sandbox.html'))
+    .then(r => r.blob())
+    .then(b => { const u = URL.createObjectURL(b); console.log('[OT Challenge] sandboxUrl ready:', u.slice(0, 50)); return u; })
+    .catch(e => console.error('[OT Challenge] sandboxUrl FAILED:', e && e.message));
 
 function createSolverFrame() {
     if (solverIframe) solverIframe.remove();
@@ -21,8 +24,7 @@ function createSolverFrame() {
     solverIframe.style.opacity = 0;
     solverIframe.style.pointerEvents = "none";
     solverIframe.tabIndex = -1;
-    console.log('[OT Challenge] setting iframe src to extension URL');
-    solverIframe.src = sandboxExtUrl;
+    sandboxUrl.then(url => { console.log('[OT Challenge] setting iframe src'); solverIframe.src = url; });
     let injectedBody = document.getElementById("injected-body");
     if (injectedBody) {
         injectedBody.appendChild(solverIframe);
