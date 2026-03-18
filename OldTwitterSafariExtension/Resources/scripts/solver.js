@@ -1,18 +1,18 @@
 // OldTwitter Challenge Solver — runs in the page's MAIN world.
 //
-// Problem: Twitter's CSP (delivered via <meta> tag, which DNR can't strip) blocks eval().
-// Solution: load vendor.js and ondemand.s.*.js as <script src> tags pointing directly to
-//   abs.twimg.com, which IS in the CSP's script-src allowlist (https://*.twimg.com).
-//   Intercept webpackChunk_twitter_responsive_web.push() to patch the challenge module
-//   as webpack processes it — no eval() needed at all.
+// Strategy:
+//   1. Load vendor.js via <script src="abs.twimg.com/..."> — no eval, CSP allows *.twimg.com
+//   2. Fetch challenge script as TEXT to extract the specific module ID (headerRegex)
+//   3. Intercept webpackChunk.push() keyed on that module ID
+//   4. Load challenge script via <script src> — webpack processes it, patched factory fires
 //
-// Communication with content script (twchallenge.js) via window.postMessage,
-// {__src: '__ot__', action: ...} — avoids Safari isolated-world postMessage issues.
+// Communication with twchallenge.js via window.postMessage {__src:'__ot__', action:...}
 
 (function () {
     const TAG = '__ot__';
     let solver = null;
     let initError = null;
+    let initializing = false;
 
     console.log('[OT Solver] main-world solver script loaded');
 
@@ -21,7 +21,7 @@
             const s = document.createElement('script');
             s.src = url;
             s.onload = function () { resolve(); };
-            s.onerror = function () { reject(new Error('Failed to load script: ' + url)); };
+            s.onerror = function () { reject(new Error('Failed to load: ' + url)); };
             document.documentElement.appendChild(s);
         });
     }
@@ -36,14 +36,18 @@
                 window.postMessage({ __src: TAG, action: 'ready' }, '*');
                 return;
             }
+            if (initializing) {
+                console.log('[OT Solver] already initializing, ignoring duplicate init');
+                return;
+            }
+            initializing = true;
             try {
-                // Step 1: Load vendor.js as <script src> — allowed by CSP (https://*.twimg.com)
-                // This bootstraps webpack (sets up webpackChunk_twitter_responsive_web with custom push)
+                // Step 1: Load vendor.js — bootstraps webpack in the main world
                 console.log('[OT Solver] loading vendor.js:', data.vendorCode);
                 await loadScript('https://abs.twimg.com/responsive-web/client-web/vendor.' + data.vendorCode + '.js');
                 console.log('[OT Solver] vendor.js loaded');
 
-                // Step 2: Set the verification meta tag and add animation SVGs
+                // Step 2: Set the verification meta tag and animation SVGs
                 let verif = document.querySelector('meta[name="twitter-site-verification"]');
                 if (!verif) {
                     verif = document.createElement('meta');
@@ -63,60 +67,71 @@
                     animsDiv.innerHTML += '\n' + anim;
                 }
 
-                // Step 3: Intercept webpack chunk push BEFORE loading the challenge script.
-                // The regex matches the challenge module factory signature.
+                // Step 3: Fetch challenge script as text to extract the module ID.
+                // This is a text-only fetch — the script is NOT executed yet.
+                const challengeUrl = 'https://abs.twimg.com/responsive-web/client-web/ondemand.s.' + data.challengeCode + 'a.js';
+                console.log('[OT Solver] fetching challenge script text:', data.challengeCode);
+                const challengeText = await fetch(challengeUrl).then(function (r) { return r.text(); });
+
+                // The module that generates transaction IDs has this unique shape in the raw bundle text:
+                // <id>:(<args>)=>{...,<args>[1]?s.d(<args>[1],{default:()=><var>})...}
                 const headerRegex = /(\d+):(.+)=>.+default:\(\)=>(\w)}\);/;
+                const headerMatch = challengeText.match(headerRegex);
+                if (!headerMatch) {
+                    throw new Error('Challenge module not found in script ' + data.challengeCode + ' (first 200: ' + challengeText.slice(0, 200) + ')');
+                }
+                const moduleId = headerMatch[1];
+                console.log('[OT Solver] challenge module id:', moduleId);
+
+                // Step 4: Intercept webpackChunk.push() for the specific module ID.
                 const chunks = window.webpackChunk_twitter_responsive_web;
                 if (!chunks) {
-                    throw new Error('webpackChunk_twitter_responsive_web not found after vendor.js loaded');
+                    throw new Error('webpackChunk_twitter_responsive_web not found after vendor.js');
                 }
 
                 const challengeReady = new Promise(function (resolve, reject) {
                     const timeout = setTimeout(function () {
                         chunks.push = origPush;
-                        reject(new Error('Timed out waiting for challenge module push'));
+                        reject(new Error('Timed out: module ' + moduleId + ' never pushed to webpack'));
                     }, 15000);
 
                     const origPush = chunks.push;
                     chunks.push = function () {
                         const chunkData = arguments[0];
-                        if (chunkData && chunkData[1]) {
-                            for (const key in chunkData[1]) {
-                                try {
-                                    const factoryStr = chunkData[1][key].toString();
-                                    if (headerRegex.test(factoryStr)) {
-                                        // Found the challenge module — wrap its factory to capture exports.default
-                                        const origFactory = chunkData[1][key];
-                                        chunkData[1][key] = function (mod, exports, wreq) {
-                                            origFactory(mod, exports, wreq);
-                                            const def = exports && exports.default;
-                                            if (typeof def === 'function') {
-                                                window._OT_CHALLENGE = function () { return def; };
-                                                clearTimeout(timeout);
-                                                chunks.push = origPush;
-                                                resolve();
-                                            }
-                                        };
-                                        break;
-                                    }
-                                } catch (_) { /* some factories aren't stringifiable */ }
-                            }
+                        if (chunkData && chunkData[1] && chunkData[1][moduleId]) {
+                            // Found our module — wrap its factory to capture exports.default
+                            const origFactory = chunkData[1][moduleId];
+                            chunkData[1][moduleId] = function (mod, exports, wreq) {
+                                origFactory(mod, exports, wreq);
+                                // After the factory runs, exports.default is a getter returning
+                                // the solver constructor (the 'var' in default:()=>var)
+                                const def = exports && exports.default;
+                                if (typeof def === 'function') {
+                                    window._OT_CHALLENGE = function () { return def; };
+                                    clearTimeout(timeout);
+                                    chunks.push = origPush;
+                                    resolve();
+                                } else {
+                                    clearTimeout(timeout);
+                                    chunks.push = origPush;
+                                    reject(new Error('exports.default is not a function after module ' + moduleId + ' ran (got ' + typeof def + ')'));
+                                }
+                            };
                         }
                         return origPush.apply(this, arguments);
                     };
                 });
 
-                // Step 4: Load ondemand.s.*.js as <script src> — allowed by CSP (https://*.twimg.com)
-                // Webpack intercepts the push and calls our patched factory, setting window._OT_CHALLENGE
-                console.log('[OT Solver] loading challenge script:', data.challengeCode);
-                await loadScript('https://abs.twimg.com/responsive-web/client-web/ondemand.s.' + data.challengeCode + 'a.js');
-                console.log('[OT Solver] challenge script loaded, waiting for module...');
+                // Step 5: Load the challenge script via <script src>.
+                // Browser uses the cached response from step 3; webpack intercepts the push.
+                console.log('[OT Solver] loading challenge script via <script src>');
+                await loadScript(challengeUrl);
+                console.log('[OT Solver] challenge script loaded, waiting for module push...');
 
-                // Step 5: Wait for interceptor to fire
                 await challengeReady;
 
                 if (typeof window._OT_CHALLENGE !== 'function') {
-                    throw new Error('_OT_CHALLENGE not set after challenge module loaded');
+                    throw new Error('_OT_CHALLENGE not set after challenge module ran');
                 }
 
                 solver = window._OT_CHALLENGE()();
@@ -126,6 +141,7 @@
             } catch (err) {
                 console.error('[OT Solver] init error:', err);
                 initError = String(err);
+                initializing = false;
                 window.postMessage({ __src: TAG, action: 'initError', error: String(err) }, '*');
             }
 

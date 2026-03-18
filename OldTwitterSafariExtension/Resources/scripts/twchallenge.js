@@ -10,9 +10,8 @@ const SOLVER_TAG = '__ot__';
 // Inject solver.js into the page's MAIN world via a web_accessible_resources <script> tag.
 // This avoids Safari's isolated-world postMessage issues (content script world ≠ page world).
 // The script runs in the page context where:
-//   - eval() works (DNR Rule 12 strips x.com's CSP; extension MV3 CSP does not apply to page context)
+//   - no eval() needed (loads vendor.js + challenge via <script src> which CSP allows for *.twimg.com)
 //   - fetch to abs.twimg.com works (DNR Rule 14 adds CORS for x.com initiator)
-//   - window.webpackChunk_twitter_responsive_web already exists (no need to re-fetch vendor.js)
 //   - window.postMessage reaches content scripts (standard cross-world communication)
 function injectSolver() {
     let existing = document.getElementById('__ot_solver__');
@@ -55,7 +54,7 @@ setInterval(() => {
         injectSolver();
         initChallenge();
     }
-}, 2000);
+}, 30000);
 
 window.addEventListener("message", (e) => {
     if (!e.data || e.data.__src !== SOLVER_TAG) return;
