@@ -31,6 +31,9 @@
   "sandbox": {
     "pages": ["sandbox.html"]
   },
+  "content_security_policy": {
+    "sandbox": "sandbox allow-scripts allow-forms allow-popups allow-modals; script-src 'self' blob: 'unsafe-inline' 'unsafe-eval' https://abs.twimg.com; connect-src https://abs.twimg.com; default-src 'self' blob:"
+  },
 
   "declarative_net_request": {
     "rule_resources" : [{
