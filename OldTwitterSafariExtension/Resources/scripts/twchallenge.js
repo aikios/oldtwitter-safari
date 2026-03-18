@@ -205,7 +205,8 @@ async function initChallenge() {
         ).map((svg) => svg.outerHTML);
 
         let vendorCode = homepageData.match(/vendor.(\w+).js"/)[1];
-        let challengeCode = homepageData.match(/"ondemand.s":"(\w+)"/)[1];
+        let challengePos = homepageData.match(/(\d+):"ondemand.s"/)[1];
+        let challengeCode = homepageData.match(new RegExp(`${challengePos}:"(\\w+)"`))[1];
         console.log('[OT Challenge] vendorCode:', vendorCode, 'challengeCode:', challengeCode);
 
         OLDTWITTER_CONFIG.verificationKey = verificationKey;
