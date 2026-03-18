@@ -9,6 +9,13 @@
 // Communication with twchallenge.js via window.postMessage {__src:'__ot__', action:...}
 
 (function () {
+    // Guard against duplicate injection (watchdog re-inject while already initialized)
+    if (window.__ot_solver_active) {
+        console.log('[OT Solver] already active, skipping re-init');
+        return;
+    }
+    window.__ot_solver_active = true;
+
     const TAG = '__ot__';
     let solver = null;
     let initError = null;

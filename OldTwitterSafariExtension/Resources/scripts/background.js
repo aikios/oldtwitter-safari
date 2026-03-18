@@ -71,4 +71,34 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             });
         return true; // keep channel open for async sendResponse
     }
+    if (request.action === "injectSolverMain") {
+        // Inject solver.js into the page's MAIN world (not isolated).
+        // <script src="extension://..."> runs in the isolated world in Safari,
+        // so we must use executeScript with world:"MAIN" to guarantee main-world execution.
+        // This ensures solver.js shares window with vendor.js and sees webpackChunk globals.
+        if (!sender.tab || !sender.tab.id) {
+            sendResponse({ error: 'no tab id' });
+            return false;
+        }
+        console.log('[OldTwitter BG] injecting solver.js into MAIN world, tab', sender.tab.id);
+        chrome.scripting
+            .executeScript({
+                target: {
+                    tabId: sender.tab.id,
+                    allFrames: false,
+                },
+                injectImmediately: true,
+                files: ['scripts/solver.js'],
+                world: "MAIN",
+            })
+            .then(() => {
+                console.log('[OldTwitter BG] solver.js MAIN world injection success');
+                sendResponse({ ok: true });
+            })
+            .catch((e) => {
+                console.error('[OldTwitter BG] solver.js MAIN world injection error:', e && e.message);
+                sendResponse({ error: e && e.message });
+            });
+        return true;
+    }
 });

@@ -7,20 +7,21 @@ let sentData = false;
 
 const SOLVER_TAG = '__ot__';
 
-// Inject solver.js into the page's MAIN world via a web_accessible_resources <script> tag.
-// This avoids Safari's isolated-world postMessage issues (content script world ≠ page world).
-// The script runs in the page context where:
-//   - no eval() needed (loads vendor.js + challenge via <script src> which CSP allows for *.twimg.com)
-//   - fetch to abs.twimg.com works (DNR Rule 14 adds CORS for x.com initiator)
-//   - window.postMessage reaches content scripts (standard cross-world communication)
+// Inject solver.js into the page's MAIN world via chrome.scripting.executeScript(world:"MAIN").
+// Direct <script src="extension://..."> runs in Safari's isolated extension world, not the main
+// world, so vendor.js globals (webpackChunk_twitter_responsive_web) are invisible to it.
+// executeScript with world:"MAIN" guarantees execution in the same JS context as page scripts.
 function injectSolver() {
-    let existing = document.getElementById('__ot_solver__');
-    if (existing) existing.remove();
-    let script = document.createElement('script');
-    script.id = '__ot_solver__';
-    script.src = chrome.runtime.getURL('scripts/solver.js');
-    document.documentElement.appendChild(script);
-    console.log('[OT Challenge] solver.js injected into main world');
+    console.log('[OT Challenge] requesting solver.js injection into MAIN world via background');
+    chrome.runtime.sendMessage({ action: 'injectSolverMain' }, (resp) => {
+        if (chrome.runtime.lastError) {
+            console.error('[OT Challenge] injectSolverMain error:', chrome.runtime.lastError.message);
+        } else if (resp && resp.error) {
+            console.error('[OT Challenge] injectSolverMain failed:', resp.error);
+        } else {
+            console.log('[OT Challenge] solver.js injected into MAIN world');
+        }
+    });
 }
 injectSolver();
 
