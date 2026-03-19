@@ -1,0 +1,30 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Xcode user data
+xcuserdata/
+*.xcuserstate
+*.xccheckout
+*.moved-aside
+DerivedData/
+*.hmap
+*.ipa
+*.xcarchive
+
+# Xcode workspace user state
+*.xcworkspace/xcuserdata/
+*.xcworkspace/xcshareddata/
+
+# Build output
+build/
+*.o
+*.d
+
+# Claude Code
+.claude/
+
+# Environment / secrets
+.env
+*.pem
