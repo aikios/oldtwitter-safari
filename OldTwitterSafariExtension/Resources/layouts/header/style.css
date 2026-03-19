@@ -1751,24 +1751,6 @@ span.tweet-body-text {
 .tweet-interact-more-menu-newtwitter:before {
     content: "\f179"
 }
-.tweet-translate-after {
-    color: var(--light-gray);
-    cursor: pointer;
-    font-size: 12px;
-    margin-top: 1px;
-    visibility: hidden;
-    float: right;
-}
-.tweet-translate-after:hover {
-    visibility: visible;
-}
-.tweet-translate-after::after {
-    content: "\f089";
-    font: 12px var(--icon-font);;
-    margin-left: 5px;
-    vertical-align: text-bottom;
-    visibility: visible;
-}
 .tweet-app-info > h3 {
     margin: 0 !important;
 }

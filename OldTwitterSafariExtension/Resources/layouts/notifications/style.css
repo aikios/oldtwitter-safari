@@ -390,8 +390,11 @@ body {
     vertical-align: top
 }
 
-.tweet-media video {
-    object-fit: var(--video-cover)
+.tweet-media video,
+.tweet-media-quote video {
+    object-fit: var(--video-cover);
+    min-width: 400px;
+    block-size: unset;
 }
 
 .tweet-interact-retweet-menu span,

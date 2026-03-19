@@ -986,10 +986,12 @@ function generateCard(tweet, tweetElement, user) {
                     img.loading = "lazy";
                     img.src = media.media_url_https;
                     img.addEventListener("click", () => {
-                        new Viewer(img, {
+                        const cardViewer = new Viewer(img, {
                             transition: false,
                             zoomRatio: 0.3,
+                            inheritedAttributes: ['decoding', 'isMap', 'referrerPolicy', 'sizes', 'srcset'],
                         });
+                        cardViewer.view(0);
                     });
                     tweetElement
                         .getElementsByClassName("tweet-card")[0]
@@ -3609,7 +3611,8 @@ async function appendTweet(t, timelineContainer, options = {}) {
                     e.preventDefault();
                     if (
                         e.target.className &&
-                        e.target.className.includes("tweet-media-element")
+                        e.target.className.includes("tweet-media-element") &&
+                        e.target.tagName === "IMG"
                     ) {
                         if (
                             !e.target.src.includes("?name=") &&
@@ -3623,11 +3626,15 @@ async function appendTweet(t, timelineContainer, options = {}) {
                                 "?name=large"
                             );
                         }
-                        new Viewer(e.target.parentElement, {
+                        const quotedMedia = e.target.parentElement;
+                        const quotedImgs = Array.from(quotedMedia.querySelectorAll('img'));
+                        const quotedClickedIndex = quotedImgs.indexOf(e.target);
+                        const quotedViewer = new Viewer(quotedMedia, {
                             transition: false,
                             zoomRatio: 0.3,
+                            inheritedAttributes: ['decoding', 'isMap', 'referrerPolicy', 'sizes', 'srcset'],
                         });
-                        e.target.click();
+                        quotedViewer.view(quotedClickedIndex >= 0 ? quotedClickedIndex : 0);
                         return;
                     }
                     new TweetViewer(user, t.quoted_status);
@@ -3923,11 +3930,14 @@ async function appendTweet(t, timelineContainer, options = {}) {
                             "?name=large"
                         );
                     }
-                    new Viewer(tweetMedia, {
+                    const mediaImgs = Array.from(tweetMedia.querySelectorAll('img'));
+                    const clickedIndex = mediaImgs.indexOf(e.target);
+                    const viewer = new Viewer(tweetMedia, {
                         transition: false,
                         zoomRatio: 0.3,
+                        inheritedAttributes: ['decoding', 'isMap', 'referrerPolicy', 'sizes', 'srcset'],
                     });
-                    e.target.click();
+                    viewer.view(clickedIndex >= 0 ? clickedIndex : 0);
                 }
             });
             if (

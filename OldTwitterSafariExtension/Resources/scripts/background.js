@@ -50,19 +50,17 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             sendResponse({ error: 'no tab id' });
             return false;
         }
-        console.log('[OldTwitter BG] injecting files into tab', sender.tab.id, ':', request.files);
         chrome.scripting
             .executeScript({
                 target: {
                     tabId: sender.tab.id,
-                    allFrames: true,
+                    allFrames: request.allFrames !== false,
                 },
                 injectImmediately: true,
                 files: request.files,
                 world: "ISOLATED",
             })
-            .then((res) => {
-                console.log('[OldTwitter BG] inject success:', JSON.stringify(res));
+            .then(() => {
                 sendResponse({ ok: true });
             })
             .catch((e) => {

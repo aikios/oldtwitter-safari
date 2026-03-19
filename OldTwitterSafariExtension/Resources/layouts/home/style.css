@@ -363,8 +363,11 @@ body {
     vertical-align: top
 }
 
-.tweet-media video {
+.tweet-media video,
+.tweet-media-quote video {
     object-fit: var(--video-cover);
+    min-width: 400px;
+    block-size: unset;
 }
 
 .center-text {
@@ -882,10 +885,6 @@ a:not(.tweet-header-info):not(.tweet-body-quote):hover,
     margin-top: 10px;
 }
 
-/* weird rendering bug */
-.tweet:first-child:not(.tweet-top-retweet-label) .tweet-translate-after {
-    margin-right: -20px;
-}
 .tweet:not(.tweet-view):last-child {
     border-bottom: 1px solid var(--border) !important;
     border-bottom-left-radius: 5px;

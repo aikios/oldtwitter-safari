@@ -633,8 +633,6 @@ const API = {
                     ) {
                         return resolve(d.credentials.data);
                     }
-                    console.log('[OldTwitter Safari DEBUG] verifyCredentials fetch (same-origin /i/api path)');
-
                     fetch(
                         `/i/api/1.1/account/verify_credentials.json`,
                         {
@@ -646,8 +644,8 @@ const API = {
                             credentials: "include",
                         }
                     )
-                        .then((response) => { console.log('[OldTwitter Safari DEBUG] verifyCredentials status:', response.status, 'ok:', response.ok); return response.json(); })
-                        .then((data) => { console.log('[OldTwitter Safari DEBUG] verifyCredentials data keys:', Object.keys(data));
+                        .then((response) => response.json())
+                        .then((data) => {
                             if (data.errors && data.errors[0].code === 32) {
                                 chrome.storage.local.remove(
                                     [
@@ -719,7 +717,6 @@ const API = {
                             });
                         })
                         .catch((e) => {
-                            console.error('[OldTwitter Safari DEBUG] verifyCredentials fetch ERROR:', e && (e.message || String(e)));
                             reject(e);
                         });
                 });

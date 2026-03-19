@@ -580,8 +580,11 @@ body {
     vertical-align: top
 }
 
-.tweet-media video {
+.tweet-media video,
+.tweet-media-quote video {
     object-fit: var(--video-cover);
+    min-width: 400px;
+    block-size: unset;
 }
 
 .center-text {

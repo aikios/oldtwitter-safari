@@ -796,20 +796,6 @@ let page =
         version2.innerText = chrome.runtime.getManifest().version;
     }
 
-    // --- SAFARI DEBUG ---
-    const _dbg = {
-        hasBrowser: typeof browser !== 'undefined',
-        hasChrome: typeof chrome !== 'undefined',
-        browserGetURL: (typeof browser !== 'undefined' && browser.runtime) ? browser.runtime.getURL('images/logo32.png') : 'N/A',
-        chromeGetURL: (typeof chrome !== 'undefined' && chrome.runtime) ? chrome.runtime.getURL('images/logo32.png') : 'N/A',
-        chromeId: (typeof chrome !== 'undefined' && chrome.runtime) ? chrome.runtime.id : 'N/A',
-    };
-    console.log('[OldTwitter Safari DEBUG]', JSON.stringify(_dbg));
-
-    // Sample the raw header_css to see if chrome-extension:// appears
-    const _fontMatch = header_css.match(/chrome-extension:\/\/[^\)'"]+/g);
-    console.log('[OldTwitter Safari DEBUG] font URLs in header_css:', _fontMatch);
-
     // Rewrite chrome-extension:// URLs to the correct runtime base URL.
     // Use browser.runtime.getURL (native in Safari) rather than chrome.runtime.getURL
     // to guarantee we get the correct safari-web-extension:// scheme.
@@ -825,11 +811,6 @@ let page =
     css = fixExtUrl(css);
     header_css = fixExtUrl(header_css);
 
-    // Confirm what font URLs look like after replacement
-    const _fontMatchAfter = header_css.match(/(?:chrome-extension|safari-web-extension):\/\/[^\)'"]+/g);
-    console.log('[OldTwitter Safari DEBUG] font URLs after fix:', _fontMatchAfter);
-    console.log('[OldTwitter Safari DEBUG] EXT_BASE:', EXT_BASE);
-
     let style = document.createElement("style");
     style.innerHTML = css;
     document.head.appendChild(style);
@@ -837,15 +818,29 @@ let page =
     header_style.innerHTML = header_css;
     document.head.appendChild(header_style);
 
-    let icon = document.createElement("link");
-    icon.href = chrome.runtime.getURL(
-        `images/logo32${vars.useNewIcon ? "_new" : ""}.png`
-    );
-    icon.rel = "icon";
-    icon.id = "site-icon";
-    document.head.appendChild(icon);
+    // Favicon: Safari does not support safari-web-extension:// URLs as favicons,
+    // blob URLs are unreliable in Safari 18+, and declarativeNetRequest redirects
+    // are not supported. The only reliable approach is a data URL embedded directly
+    // in the content script — no fetch, no extension URL lookup needed.
+    // Ensure site-icon link exists for header/script.js updateUnread() to find.
+    // blockBeforeInject.js injects this early at document_start; this is a fallback.
+    if (!document.getElementById('site-icon')) {
+        const _faviconLink = document.createElement("link");
+        _faviconLink.id = "site-icon";
+        _faviconLink.rel = "icon";
+        _faviconLink.type = "image/x-icon";
+        _faviconLink.href = "https://abs.twimg.com/favicons/twitter.3.ico";
+        document.head.appendChild(_faviconLink);
+    }
 
     history.scrollRestoration = "manual";
+
+    // Trigger a history replaceState so Safari re-evaluates the <link rel="icon">
+    // in the new DOM. Safari only processes favicon links on navigation events,
+    // not when innerHTML is replaced in place.
+    // Use null state (not history.state) to avoid serialization issues in Safari.
+    // Defer to next tick so the DOM is fully committed before Safari reads it.
+    setTimeout(() => history.replaceState(null, '', location.href), 0);
 
     // gif.js
     fetch(chrome.runtime.getURL("libraries/gif.worker.js"))
@@ -887,9 +882,11 @@ let page =
         { passive: false }
     );
 
-    // Inject layout scripts directly from the content script isolated world.
-    // This guarantees they share the same scope as vars, API, LOC etc. defined
-    // by the other content scripts, and bypasses any page CSP restrictions.
+    // Inject layout scripts via background executeScript (world: ISOLATED).
+    // fetch(safari-web-extension://...) fails CORS from x.com origin; the background
+    // script has extension origin and can load these files without CORS issues.
+    // All isolated-world content scripts share the same scope, so vars/API/LOC etc.
+    // defined by other content scripts are accessible to these injected files.
     const _injectFiles = [
             "libraries/purify.min.js",
             "libraries/twemoji.min.js",
@@ -907,15 +904,5 @@ let page =
             "scripts/iframeNavigation.js",
         ].filter((i) => i);
 
-    (async () => {
-        for (const file of _injectFiles) {
-            try {
-                const code = await fetch(_getURL(file)).then(r => r.text());
-                (0, eval)(code);
-                console.log('[OldTwitter Safari DEBUG] injected:', file);
-            } catch(e) {
-                console.error('[OldTwitter Safari DEBUG] failed to inject:', file, e && e.message);
-            }
-        }
-    })();
+    chrome.runtime.sendMessage({ action: 'inject', files: _injectFiles, allFrames: false });
 })();

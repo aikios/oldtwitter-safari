@@ -100,6 +100,18 @@ window.addEventListener("message", (e) => {
 
 window._fetch = window.fetch;
 fetch = async function (url, options) {
+    // In Safari, fetching safari-web-extension:// URLs via window.fetch hangs due to
+    // CORS — the page origin (x.com) can't access extension resources. Route through
+    // the background service worker which has extension origin and can load them.
+    if (typeof url === 'string' && (url.startsWith('safari-web-extension://') || url.startsWith('chrome-extension://'))) {
+        return new Promise(function (resolve, reject) {
+            chrome.runtime.sendMessage({ action: 'fetchProxy', url: url, options: {} }, function (resp) {
+                if (chrome.runtime.lastError) { reject(new Error(chrome.runtime.lastError.message)); return; }
+                if (!resp || resp.error) { reject(new Error(resp ? resp.error : 'fetchProxy failed')); return; }
+                resolve(new Response(resp.text, { status: resp.status }));
+            });
+        });
+    }
     if (
         !url.startsWith("/i/api") &&
         !url.startsWith("https://api.twitter.com") &&

@@ -55,7 +55,7 @@
         "action": {
             "type": "redirect",
             "redirect": {
-                "extensionPath": "/images/logo32_new.png"
+                "extensionPath": "/images/logo32.png"
             }
         },
         "condition": {
@@ -384,6 +384,33 @@
                 "image",
                 "font",
                 "xmlhttprequest",
+                "other"
+            ]
+        }
+    },
+    {
+        "id": 16,
+        "priority": 2,
+        "action": {
+            "type": "block"
+        },
+        "condition": {
+            "urlFilter": "||x.com/favicon.ico"
+        }
+    },
+    {
+        "id": 17,
+        "priority": 2,
+        "action": {
+            "type": "redirect",
+            "redirect": {
+                "extensionPath": "/images/favicon.ico"
+            }
+        },
+        "condition": {
+            "urlFilter": "||twitter.com/favicon.ico",
+            "resourceTypes": [
+                "image",
                 "other"
             ]
         }

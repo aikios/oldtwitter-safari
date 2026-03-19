@@ -365,11 +365,7 @@ async function renderTimeline(options = {}) {
 }
 function renderNewTweetsButton() {
     if (timeline.toBeUpdated > 0) {
-        document.getElementById("new-tweets-bug-fix").innerHTML = html`
-            .tweet:first-child .tweet-translate-after {
-                margin-right: 0 !important;
-            }
-        `;
+        document.getElementById("new-tweets-bug-fix").innerHTML = html``;
         document.getElementById('new-tweets').hidden = false;
         document.getElementById('new-tweets').innerText = `${LOC.see_new_tweets.message}`;
         if(vars.updateTimelineAutomatically) {
@@ -522,13 +518,6 @@ setTimeout(async () => {
         document.getElementById('new-tweet-media-div').classList.add('new-tweet-media-div-focused');
         if(e.target !== newTweetText) {
             newTweetText.dataset.blurSince = Date.now();
-        }
-        let firstTweet = document.getElementsByClassName('tweet')[0];
-        if(firstTweet) {
-            let ta = firstTweet.getElementsByClassName('tweet-translate-after')[0];
-            if(ta) {
-                ta.style.marginRight = '0px';
-            }
         }
     });
     document.getElementById('new-tweet').addEventListener('drop', e => {
@@ -1052,13 +1041,6 @@ setTimeout(async () => {
         document.getElementById('new-tweet-poll').style.width = '0';
         document.getElementById('new-tweet-poll').hidden = true;
         document.getElementById('new-tweet-focused').hidden = true;
-        let firstTweet = document.getElementsByClassName('tweet')[0];
-        if(firstTweet) {
-            let ta = firstTweet.getElementsByClassName('tweet-translate-after')[0];
-            if(ta) {
-                ta.style.marginRight = '-20px';
-            }
-        }
         document.getElementById('new-tweet-audience').hidden = true;
         document.getElementById('new-tweet-char').hidden = true;
         document.getElementById('new-tweet-text').classList.remove('new-tweet-text-focused');
@@ -1266,13 +1248,6 @@ setTimeout(async () => {
         let newTweetText = document.getElementById('new-tweet-text');
         if(newTweetText && newTweetText.className && newTweetText.className.includes('new-tweet-text-focused') && newTweetText.dataset.blurSince && Date.now() - (+newTweetText.dataset.blurSince) > 55000) {
             document.getElementById('new-tweet-focused').hidden = true;
-            let firstTweet = document.getElementsByClassName('tweet')[0];
-            if(firstTweet) {
-                let ta = firstTweet.getElementsByClassName('tweet-translate-after')[0];
-                if(ta) {
-                    ta.style.marginRight = '-20px';
-                }
-            }
             document.getElementById('new-tweet-audience').classList.add("hidden");
             document.getElementById('new-tweet-char').hidden = true;
             document.getElementById('new-tweet-text').classList.remove('new-tweet-text-focused');

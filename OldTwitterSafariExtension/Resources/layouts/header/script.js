@@ -32,7 +32,7 @@ notificationBus.onmessage = function (e) {
         let icon = document.getElementById('site-icon');
 
         notifElement.hidden = true;
-        icon.href = chrome.runtime.getURL(`images/logo32${vars.useNewIcon ? '_new' : ''}.png`);
+        icon.href = browser.runtime.getURL(`images/logo32${vars.useNewIcon ? '_new' : ''}.png`);
         if(document.title.startsWith("(")) {
             document.title = document.title.split(') ').slice(1).join(') ');
         }
@@ -486,7 +486,6 @@ let userDataFunction = async user => {
         root.style.setProperty('--birthday-icon', '"\\f092"');
         root.style.setProperty('--joined-icon', '"\\f203"');
     }
-    console.log(vars);
     if(vars.heartsNotStars) {
         root.style.setProperty('--favorite-icon-content', '"\\f148"');
         root.style.setProperty('--favorite-icon-content-notif', '"\\f015"');
@@ -554,7 +553,7 @@ let userDataFunction = async user => {
         } else {
             notifElement.hidden = true;
         }
-        icon.href = total > 0 ? chrome.runtime.getURL(`images/logo32${vars.useNewIcon ? '_new' : ''}_notification.png`) : chrome.runtime.getURL(`images/logo32${vars.useNewIcon ? '_new' : ''}.png`);
+        icon.href = total > 0 ? browser.runtime.getURL(`images/logo32${vars.useNewIcon ? '_new' : ''}_notification.png`) : browser.runtime.getURL(`images/logo32${vars.useNewIcon ? '_new' : ''}.png`);
         if(total > 0) {
             let newTitle = document.title;
             if(document.title.startsWith('(')) {
@@ -979,11 +978,12 @@ let userDataFunction = async user => {
                             if(e.target.src.includes(':small')) {
                                 e.target.src = e.target.src.replace(':small', '');
                             };
-                            new Viewer(photoElement, {
+                            const dmViewer = new Viewer(photoElement, {
                                 transition: false,
-                        zoomRatio: 0.3
+                                zoomRatio: 0.3,
+                                inheritedAttributes: ['decoding', 'isMap', 'referrerPolicy', 'sizes', 'srcset'],
                             });
-                            e.target.click();
+                            dmViewer.view(0);
                         })
                         messageAttachments.append(photoElement);
                     }
@@ -1143,8 +1143,6 @@ let userDataFunction = async user => {
                 messageElement.innerHTML = messageText;
 
                 messageElements.push(messageElement);
-            } else {
-                //console.log(lastEntry)
             }
         }
         if(!newMessages) {
@@ -1335,8 +1333,6 @@ let userDataFunction = async user => {
             } else if (lastEvent.type == 'join_conversation') {
                 let userWhoAdded = inbox.users[lastMessage.sender_id];
                 messageEntry.preview = LOC.user_added_you_inbox.message.replace('$NAME$', escapeHTML(userWhoAdded.name));
-            } else {
-                //console.log(lastEvent)
             }
             messageElement.innerHTML = html`
                 <img src="${messageEntry.icon}" width="48" height="48" class="inbox-message-avatar">
@@ -2919,7 +2915,7 @@ let userDataFunction = async user => {
                                 let notifElement = document.getElementById('notifications-count');
                                 let icon = document.getElementById('site-icon');
                                 notifElement.hidden = true;
-                                icon.href = chrome.runtime.getURL(`images/logo32${vars.useNewIcon ? '_new' : ''}.png`);
+                                icon.href = browser.runtime.getURL(`images/logo32${vars.useNewIcon ? '_new' : ''}.png`);
                                 let newTitle = document.title;
                                 if(document.title.startsWith('(')) {
                                     newTitle = document.title.split(') ')[1];

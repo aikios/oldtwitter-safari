@@ -337,6 +337,14 @@ async function constructQuotedTweet(
             if (m.type == "video") {
                 mediaElement.disableRemotePlayback = true;
                 mediaElement.controls = true;
+                // Prevent the parent <a> tag from navigating on video clicks.
+                // stopPropagation alone doesn't stop <a> activation (browser tracks
+                // clicks on descendants). preventDefault stops navigation; the shadow
+                // DOM controls already called play() before this event bubbled out.
+                mediaElement.addEventListener('click', e => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                });
             }
             if (m.type == "animated_gif") {
                 mediaElement.disableRemotePlayback = true;
@@ -595,21 +603,6 @@ async function constructTweet(t, tweetConstructorArgs, options = {}) {
             )
         );
     }
-    // translate icon for timelines.
-    if (!options.mainTweet && !tweetConstructorArgs.isMatchingLanguage) {
-        tweetHeaderBlock.push(
-            elNew(
-                "span",
-                { className: ["tweet-translate-after", "tweet-button"] },
-                [
-                    `${t.user.name} ${t.user.screen_name} 1 Sept`.length < 40 &&
-                    innerWidth > 650
-                        ? LOC.view_translation.message
-                        : null,
-                ]
-            )
-        );
-    }
 
     const tweetTopConst = elNew("template", {}, [
         _tweetTopConst,
@@ -776,7 +769,6 @@ async function constructTweet(t, tweetConstructorArgs, options = {}) {
                 ...interleave(resolutionNodes, " / "),
             ]);
         }
-        // console.log([videoOverlay, ...mediaNodes]);
         extended_media_nodes = [
             elNew("div", { class: ["tweet-media"] }, [
                 videoOverlay,
@@ -1821,7 +1813,7 @@ async function constructTweet(t, tweetConstructorArgs, options = {}) {
         [
             mentioned_node,
             body_node,
-            !tweetConstructorArgs.isMatchingLanguage && options.mainTweet
+            !tweetConstructorArgs.isMatchingLanguage
                 ? translate_node
                 : null,
             extended_media_nodes,

@@ -3436,11 +3436,18 @@ class TweetViewer {
                             "?name=large"
                         );
                     }
-                    new Viewer(tweetMedia, {
+                    // Find which image in the container was clicked.
+                    const mediaImgs = Array.from(tweetMedia.querySelectorAll('img'));
+                    const clickedIndex = mediaImgs.indexOf(e.target);
+                    const viewer = new Viewer(tweetMedia, {
                         transition: false,
                         zoomRatio: 0.3,
+                        // Exclude loading/crossOrigin from inherited attributes:
+                        // loading="lazy" prevents eager loading in the lightbox,
+                        // crossOrigin can cause CORS cache conflicts in Safari.
+                        inheritedAttributes: ['decoding', 'isMap', 'referrerPolicy', 'sizes', 'srcset'],
                     });
-                    e.target.click();
+                    viewer.view(clickedIndex >= 0 ? clickedIndex : 0);
                 }
             });
         }

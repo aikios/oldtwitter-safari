@@ -67,7 +67,7 @@ async function updateNotifications(options = { mode: 'rewrite', quiet: false }) 
                 if(windowFocused) {
                     chrome.storage.local.remove(['unreadCount'], () => {});
                     if (data.unreadNotifications > 0) {
-                        document.getElementById('site-icon').href = chrome.runtime.getURL(`images/logo32${vars.useNewIcon ? '_new' : ''}_notification.png`);
+                        document.getElementById('site-icon').href = browser.runtime.getURL(`images/logo32${vars.useNewIcon ? '_new' : ''}_notification.png`);
                         let newTitle = document.title;
                         if(document.title.startsWith('(')) {
                             newTitle = document.title.split(') ')[1];
@@ -169,7 +169,7 @@ setTimeout(async () => {
         windowFocused = vis;
         if(vis) {
             notificationBus.postMessage({type: 'markAsRead', cursor: undefined});
-            document.getElementById('site-icon').href = chrome.runtime.getURL(`images/logo32${vars.useNewIcon ? '_new' : ''}.png`);
+            document.getElementById('site-icon').href = browser.runtime.getURL(`images/logo32${vars.useNewIcon ? '_new' : ''}.png`);
         }
     });
 
