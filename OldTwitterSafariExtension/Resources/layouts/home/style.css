@@ -573,14 +573,17 @@ a:not(.tweet-header-info):not(.tweet-body-quote):hover,
 #new-tweet-text {
     border: 1px solid var(--border);
     border-radius: 3px;
+    box-sizing: border-box;
     display: inline-block;
     font: 18px var(--font-override);
-    height: 23px;
+    height: 35px;
+    overflow-y: hidden;
     padding: 5px;
     padding-right: 40px;
     resize: none;
     scrollbar-width: thin;
-    width: 476px
+    vertical-align: top;
+    width: calc(100% - 50px)
 }
 #new-tweet-text::placeholder {
     color: var(--link-color);
@@ -598,7 +601,8 @@ a:not(.tweet-header-info):not(.tweet-body-quote):hover,
 }
 
 .new-tweet-text-focused {
-    height: 100px !important
+    height: 100px !important;
+    overflow-y: auto !important
 }
 
 #new-tweet {
