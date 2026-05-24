@@ -662,7 +662,7 @@ async function constructTweet(t, tweetConstructorArgs, options = {}) {
     // Main text content
     const longShortClass =
         vars.noBigFont ||
-        t.full_text.length > 280 ||
+        (t.full_text?.length ?? 0) > 280 ||
         !options.bigFont ||
         (!options.mainTweet && location.pathname.includes("/status/"))
             ? "tweet-body-text-long"
@@ -1813,7 +1813,7 @@ async function constructTweet(t, tweetConstructorArgs, options = {}) {
         [
             mentioned_node,
             body_node,
-            !tweetConstructorArgs.isMatchingLanguage
+            !tweetConstructorArgs.isMatchingLanguage && options.mainTweet
                 ? translate_node
                 : null,
             extended_media_nodes,

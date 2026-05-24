@@ -95,12 +95,14 @@
                 const challengeText = await fetch(challengeUrl).then(function (r) { return r.text(); });
                 console.log('[OT Solver] challenge script fetched, length:', challengeText.length);
 
-                const headerRegex = /(\d+):(.+)=>.+default:\(\)=>(\w)}\);/;
-                const headerMatch = challengeText.match(headerRegex);
-                if (!headerMatch) {
-                    throw new Error('Challenge module not found in script ' + data.challengeCode + ' (first 200: ' + challengeText.slice(0, 200) + ')');
+                // Match both arrow-property format  {id:(t,n,r)=>...}
+                // and method-shorthand format       {id(t,n,r){...}}
+                // Twitter changed to method shorthand in ~April 2026.
+                const idMatch = challengeText.match(/\.push\(\[\[\d+\],\{(\d+)[:(]/);
+                if (!idMatch) {
+                    throw new Error('Challenge module ID not found in script ' + data.challengeCode + ' (first 200: ' + challengeText.slice(0, 200) + ')');
                 }
-                const moduleId = headerMatch[1];
+                const moduleId = idMatch[1];
                 console.log('[OT Solver] challenge module id:', moduleId);
 
                 // Step 4: Find the webpack chunk array (detect name dynamically in case

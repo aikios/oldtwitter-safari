@@ -1439,7 +1439,7 @@ class TweetViewer {
             blockUserText = `${LOC.block_user.message} @${t.user.screen_name}`;
             unblockUserText = `${LOC.unblock_user.message} @${t.user.screen_name}`;
         }
-        if (t.in_reply_to_screen_name && t.display_text_range) {
+        if (t.in_reply_to_screen_name && t.display_text_range && t.entities.user_mentions) {
             t.entities.user_mentions.forEach((user_mention) => {
                 if (user_mention.indices[0] < t.display_text_range[0]) {
                     mentionedUserText += `<a href="/${user_mention.screen_name}">@${user_mention.screen_name}</a> `;
@@ -1450,7 +1450,8 @@ class TweetViewer {
         if (
             t.quoted_status &&
             t.quoted_status.in_reply_to_screen_name &&
-            t.display_text_range
+            t.display_text_range &&
+            t.quoted_status.entities.user_mentions
         ) {
             t.quoted_status.entities.user_mentions.forEach((user_mention) => {
                 if (user_mention.indices[0] < t.display_text_range[0]) {
