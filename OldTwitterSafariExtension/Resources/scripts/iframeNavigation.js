@@ -59,6 +59,10 @@ function useIframeNavigation(e) {
     // because of dumb mozilla's policies need to turn off this feature
     // (they don't allow changing security headers so cant modify x-frame-options)
     if (navigator.userAgent.toLowerCase().includes("firefox")) return;
+    // Safari doesn't reliably inject content scripts into programmatically-created
+    // iframes at document_start, so the extension layout never replaces the blank
+    // Twitter loading page inside the iframe. Fall back to full page navigation.
+    if (chrome.runtime.getURL('').startsWith('safari-web-extension://')) return;
 
     let a = e.target.closest("a");
     if (
