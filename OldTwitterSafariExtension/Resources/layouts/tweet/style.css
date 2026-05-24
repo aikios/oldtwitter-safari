@@ -617,17 +617,15 @@ a:hover,
 #new-tweet-text {
     border: 1px solid var(--border);
     border-radius: 3px;
-    box-sizing: border-box;
     display: inline-block;
     font: 18px var(--font-override);
-    height: 35px;
-    overflow-y: hidden;
+    height: 23px;
+    overflow-x: hidden;
     padding: 5px;
     padding-right: 40px;
     resize: none;
     scrollbar-width: thin;
-    vertical-align: top;
-    width: calc(100% - 50px)
+    width: 480px
 }
 
 #new-tweet-text::-webkit-scrollbar {
@@ -639,8 +637,7 @@ a:hover,
 }
 
 .new-tweet-text-focused {
-    height: 100px !important;
-    overflow-y: auto !important
+    height: 100px !important
 }
 
 #new-tweet {
