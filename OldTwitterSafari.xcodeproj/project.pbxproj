@@ -11,8 +11,6 @@
 		AA000001000000000000004A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA000001000000000000004B /* Assets.xcassets */; };
 		AA000001000000000000005A /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = AA000001000000000000005B /* Info.plist */; };
 		AA000001000000000000006A /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000001000000000000006B /* SafariWebExtensionHandler.swift */; };
-		AA000001000000000000007A /* Resources in Resources */ = {isa = PBXBuildFile; fileRef = AA000001000000000000007B /* Resources */; };
-		AA000001000000000000008A /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = AA000001000000000000008B /* Info.plist */; };
 		AA000001000000000000009A /* OldTwitterSafariExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = AA00000100000000000000FB /* OldTwitterSafariExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
@@ -21,28 +19,10 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = AA000001000000000000011B /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = AA00000100000000000000EC /* OldTwitterSafariExtension */;
+			remoteGlobalIDString = AA00000100000000000000EC;
 			remoteInfo = OldTwitterSafariExtension;
 		};
 /* End PBXContainerItemProxy section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		AA000001000000000000030A /* Copy Web Extension Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"$(SRCROOT)/OldTwitterSafariExtension/Resources/",
-			);
-			name = "Copy Web Extension Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "rsync -a --delete \"${SRCROOT}/OldTwitterSafariExtension/Resources/\" \"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\n";
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		AA000001000000000000012A /* Embed Foundation Extensions */ = {
@@ -66,18 +46,18 @@
 		AA000001000000000000007B /* Resources */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Resources; sourceTree = "<group>"; };
 		AA000001000000000000008B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AA00000100000000000000EB /* OldTwitterSafari.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OldTwitterSafari.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		AA00000100000000000000FB /* OldTwitterSafariExtension.appex */ = {isa = PBXFileReference; explicitFileType = wrapper.app-extension; includeInIndex = 0; path = OldTwitterSafariExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA00000100000000000000FB /* OldTwitterSafariExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OldTwitterSafariExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		AA000001000000000000013A /* Frameworks (App) */ = {
+		AA000001000000000000013A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		AA000001000000000000014A /* Frameworks (Ext) */ = {
+		AA000001000000000000014A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -116,7 +96,7 @@
 			path = OldTwitterSafariExtension;
 			sourceTree = "<group>";
 		};
-		AA000001000000000000018B /* Root */ = {
+		AA000001000000000000018B = {
 			isa = PBXGroup;
 			children = (
 				AA000001000000000000016B /* OldTwitterSafari */,
@@ -192,7 +172,7 @@
 				en,
 				Base,
 			);
-			mainGroup = AA000001000000000000018B /* Root */;
+			mainGroup = AA000001000000000000018B;
 			productRefGroup = AA000001000000000000015B /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -204,7 +184,7 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		AA000001000000000000021A /* Resources (App) */ = {
+		AA000001000000000000021A /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -213,7 +193,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		AA000001000000000000025A /* Resources (Ext) */ = {
+		AA000001000000000000025A /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -222,8 +202,26 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		AA000001000000000000030A /* Copy Web Extension Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/OldTwitterSafariExtension/Resources/",
+			);
+			name = "Copy Web Extension Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "rsync -a --delete \"${SRCROOT}/OldTwitterSafariExtension/Resources/\" \"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
-		AA000001000000000000020A /* Sources (App) */ = {
+		AA000001000000000000020A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -231,7 +229,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		AA000001000000000000024A /* Sources (Ext) */ = {
+		AA000001000000000000024A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -250,7 +248,7 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		AA000001000000000000027A /* Debug (Project) */ = {
+		AA000001000000000000027A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -311,7 +309,7 @@
 			};
 			name = Debug;
 		};
-		AA000001000000000000028A /* Release (Project) */ = {
+		AA000001000000000000028A /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -364,64 +362,67 @@
 			};
 			name = Release;
 		};
-		AA000001000000000000029A /* Debug (App) */ = {
+		AA000001000000000000029A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = K4QWBR2FT9;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = OldTwitterSafari/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.oldtwitter.safari";
+				PRODUCT_BUNDLE_IDENTIFIER = com.oldtwitter.safari;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
-		AA00000100000000000002AA /* Release (App) */ = {
+		AA00000100000000000002AA /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = K4QWBR2FT9;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = OldTwitterSafari/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.oldtwitter.safari";
+				PRODUCT_BUNDLE_IDENTIFIER = com.oldtwitter.safari;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
-		AA00000100000000000002BA /* Debug (Ext) */ = {
+		AA00000100000000000002BA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = OldTwitterSafariExtension/OldTwitterSafariExtension.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = K4QWBR2FT9;
 				INFOPLIST_FILE = OldTwitterSafariExtension/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 					"@executable_path/../../../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.oldtwitter.safari.extension";
+				PRODUCT_BUNDLE_IDENTIFIER = com.oldtwitter.safari.extension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -429,20 +430,21 @@
 			};
 			name = Debug;
 		};
-		AA00000100000000000002CA /* Release (Ext) */ = {
+		AA00000100000000000002CA /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = OldTwitterSafariExtension/OldTwitterSafariExtension.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = K4QWBR2FT9;
 				INFOPLIST_FILE = OldTwitterSafariExtension/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 					"@executable_path/../../../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.oldtwitter.safari.extension";
+				PRODUCT_BUNDLE_IDENTIFIER = com.oldtwitter.safari.extension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -453,15 +455,6 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		AA000001000000000000026B /* Build configuration list for PBXProject "OldTwitterSafari" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				AA000001000000000000027A /* Debug */,
-				AA000001000000000000028A /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		AA000001000000000000019B /* Build configuration list for PBXNativeTarget "OldTwitterSafari" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -480,8 +473,16 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		AA000001000000000000026B /* Build configuration list for PBXProject "OldTwitterSafari" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA000001000000000000027A /* Debug */,
+				AA000001000000000000028A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 /* End XCConfigurationList section */
-
 	};
 	rootObject = AA000001000000000000011B /* Project object */;
 }
